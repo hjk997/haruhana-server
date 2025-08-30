@@ -63,5 +63,8 @@ haruhana-server/
 ```bash
 # WSL / Ubuntu 환경에서 실행
 docker-compose up -d  # PostgreSQL 실행
+
+# 라이브러리 설치 
+pip install -r requirements.txt
 ```
 
