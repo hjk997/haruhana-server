@@ -20,7 +20,7 @@ COMMENT ON COLUMN users.user_nm IS '사용자 이름';
 COMMENT ON COLUMN users.user_email IS '이메일';
 COMMENT ON COLUMN users.create_dt IS '생성일';
 COMMENT ON COLUMN users.delete_dt IS '삭제일';
-COMMENT ON COLUMN users.isDelete IS '삭제 여부 플래그';
+COMMENT ON COLUMN users.is_delete IS '삭제 여부 플래그';
 
 
 -- Stamps 테이블
@@ -36,8 +36,8 @@ CREATE TABLE stamps (
     modify_dt DATE,
     complete_dt DATE,
     delete_dt DATE,
-    isComplete BOOLEAN DEFAULT FALSE,
-    isDelete BOOLEAN DEFAULT FALSE,
+    is_complete BOOLEAN DEFAULT FALSE,
+    is_delete BOOLEAN DEFAULT FALSE,
     CONSTRAINT fk_stamp_user FOREIGN KEY (user_id) REFERENCES "users"(user_id)
 );
 
@@ -53,8 +53,8 @@ COMMENT ON COLUMN stamps.create_dt IS '생성일';
 COMMENT ON COLUMN stamps.modify_dt IS '수정일';
 COMMENT ON COLUMN stamps.complete_dt IS '완료일';
 COMMENT ON COLUMN stamps.delete_dt IS '삭제일';
-COMMENT ON COLUMN stamps.isComplete IS '완료 여부 플래그';
-COMMENT ON COLUMN stamps.isDelete IS '삭제 여부 플래그';
+COMMENT ON COLUMN stamps.is_complete IS '완료 여부 플래그';
+COMMENT ON COLUMN stamps.is_delete IS '삭제 여부 플래그';
 
 
 -- SystemLogs 테이블

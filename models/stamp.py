@@ -17,5 +17,5 @@ class Stamps(Base):
     modify_dt = Column(Date, nullable=True)                                   # DATE
     complete_dt = Column(Date, nullable=True)                                 # DATE
     delete_dt = Column(Date, nullable=True)                                   # DATE
-    isComplete = Column(Boolean, nullable=False, default=False)               # BOOLEAN DEFAULT FALSE
-    isDelete = Column(Boolean, nullable=False, default=False)                 # BOOLEAN DEFAULT FALSE
+    is_complete = Column(Boolean, nullable=False, default=False)               # BOOLEAN DEFAULT FALSE
+    is_delete = Column(Boolean, nullable=False, default=False)                 # BOOLEAN DEFAULT FALSE

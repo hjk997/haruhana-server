@@ -1,9 +1,8 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.responses import JSONResponse
 from jose import jwt, JWTError
-from routers import login
 from core.logger import logger 
-from routers import signup
+from routers import login, signup, stamp
 from fastapi.middleware.cors import CORSMiddleware
 
 ctx = ''
@@ -15,8 +14,9 @@ app = FastAPI()
 # 라우터 등록
 app.include_router(login.login_router)
 app.include_router(signup.signup_router)
+app.include_router(stamp.stamp_router)
 
-# 로컬에서만 허용 (포트는 프론트엔드가 띄워진 포트로 맞춰주세요)
+# CORS 에러 처리 : 로컬에서만 허용 
 origins = [
     "http://localhost:5500",  # 예시: VSCode Live Server
     "http://127.0.0.1:5500"
@@ -33,9 +33,13 @@ app.add_middleware(
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
     logger.info('진입!!')
+    # OPTIONS 메서드는 인증 없이 통과
+    if request.method == "OPTIONS":
+        return await call_next(request)
     # 공개 API는 통과
-    if request.url.path.startswith(ctx + "/login") or request.url.path.startswith(ctx + "/signup"):
-        logger.info('로그인 시도!!')
+    public_paths = ["/login", "/signup", "/docs", "/redoc", "/openapi.json" ]
+    if any(request.url.path.startswith(ctx + path) for path in public_paths):
+        logger.info('공개 API 접근: %s', request.url.path)
         return await call_next(request)
 
     token = request.headers.get("Authorization")
@@ -52,3 +56,9 @@ async def auth_middleware(request: Request, call_next):
     # 다음으로 전달
     response = await call_next(request)
     return response
+
+def get_current_user(request: Request):
+    """
+    FastAPI Depends로 사용할 수 있는 유저 정보 추출 함수
+    """
+    return request.state.user

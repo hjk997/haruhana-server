@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from models import User  # ORM 모델
 from schemas.user import UserCreate, UserUpdate, UserPublic
 from schemas.common import ResponseMessage
 from db.database import get_db
@@ -25,14 +24,6 @@ router = APIRouter(
 @router.get("/{user_id}", response_model=UserPublic)
 def read_user_route(user_id: str, db: Session = Depends(get_db)):
     user = get_user(user_id, db=db)
-
-# -----------------------------
-# 사용자 생성
-# -----------------------------
-@router.post("/", response_model=ResponseMessage)
-def create_user_route(user: UserCreate, db: Session = Depends(get_db)):
-    msg = create_user(user, db=db)
-    return msg
 
 # -----------------------------
 # 사용자 수정
