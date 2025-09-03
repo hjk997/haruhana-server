@@ -29,9 +29,9 @@ def upload_file(user_id: str, file: UploadFile = File(...)):
     :return: 업로드 결과 메시지
     """
     try:
-        file_id = str(uuid.uuid4()) + "_" + user_id
+        file_id = str(uuid.uuid4()) + "_" + user_id + "." + file.filename.split(".")[-1]
         s3_client.upload_fileobj(file.file, BUCKET_NAME, file_id)
-        return ResponseMessage(code="200", message="Upload successful", id=file_id)
+        return ResponseMessage(code=200, message="Upload successful", id=file_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -47,7 +47,7 @@ def download_file(file_id: str):
             Params={"Bucket": BUCKET_NAME, "Key": file_id},
             ExpiresIn=3600,  # 1시간 유효
         )
-        return {"download_url": url}
+        return {"code": 200, "download_url": url}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
