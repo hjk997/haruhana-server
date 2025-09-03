@@ -19,3 +19,5 @@ class Stamps(Base):
     delete_dt = Column(Date, nullable=True)                                   # DATE
     is_complete = Column(Boolean, nullable=False, default=False)               # BOOLEAN DEFAULT FALSE
     is_delete = Column(Boolean, nullable=False, default=False)                 # BOOLEAN DEFAULT FALSE
+    before_image_id = Column(UUID(as_uuid=True), ForeignKey("stamp_images.image_id"), nullable=True)  # FK → stamp_images.image_id
+    after_image_id = Column(UUID(as_uuid=True), ForeignKey("stamp_images.image_id"), nullable=True)   # FK → stamp_images.image_id
