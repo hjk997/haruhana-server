@@ -56,7 +56,6 @@ COMMENT ON COLUMN stamps.delete_dt IS '삭제일';
 COMMENT ON COLUMN stamps.is_complete IS '완료 여부 플래그';
 COMMENT ON COLUMN stamps.is_delete IS '삭제 여부 플래그';
 
-
 -- SystemLogs 테이블
 CREATE TABLE system_logs (
     log_id UUID PRIMARY KEY,
@@ -73,3 +72,38 @@ COMMENT ON COLUMN system_logs.user_id IS 'FK, users.user_id';
 COMMENT ON COLUMN system_logs.log_type IS '로그 타입 (예: LOGIN, ERROR 등)';
 COMMENT ON COLUMN system_logs.log_desc IS '비고';
 COMMENT ON COLUMN system_logs.log_date IS '로그 발생 일자';
+
+/**
+*   2025.08.31  - 스탬프 이미지 테이블 및 stamps 테이블 이미지 컬럼 추가
+*
+*/
+-- stame_images 테이블 
+CREATE TABLE stamp_images (
+    image_id UUID PRIMARY KEY,
+    image_key TEXT NOT NULL,
+    is_public BOOLEAN DEFAULT TRUE,
+    user_id VARCHAR(30),
+    create_dt DATE default current_timestamp,
+    is_delete BOOLEAN DEFAULT FALSE,
+    delete_dt DATE,
+    image_type VARCHAR(10) NOT NULL,
+    CONSTRAINT fk_image_user FOREIGN KEY (user_id) REFERENCES "users"(user_id)
+);
+
+COMMENT ON TABLE stamp_images IS '스탬프 이미지 테이블';
+COMMENT ON COLUMN stamp_images.image_key IS 'PK, 자동 증가';
+COMMENT ON COLUMN stamp_images.image_url IS '이미지 URL(S3 또는 MinIO 경로)';
+COMMENT ON COLUMN stamp_images.is_public IS '공개 여부 플래그';
+COMMENT ON COLUMN stamp_images.user_id IS 'FK, users.user_id: 유저 전용일 시 사용';
+COMMENT ON COLUMN stamp_images.create_dt IS '업로드 일자';
+COMMENT ON COLUMN stamp_images.is_delete IS '삭제 여부 플래그';
+COMMENT ON COLUMN stamp_images.delete_dt IS '삭제 일자';
+COMMENT ON COLUMN stamp_images.image_type IS '이미지 유형(before, after)';
+
+ALTER TABLE stamps ADD COLUMN before_image_id UUID;
+ALTER TABLE stamps ADD COLUMN after_image_id UUID;
+
+ALTER TABLE stamps ADD CONSTRAINT fk_before_image FOREIGN KEY (before_image_id) REFERENCES stamp_images(image_id);
+ALTER TABLE stamps ADD CONSTRAINT fk_after_image FOREIGN KEY (after_image_id) REFERENCES stamp_images(image_id);
+
+ALTER TABLE stamp_images ADD CONSTRAINT uq_image_key UNIQUE (image_key);  -- image_key는 고유값 보장
