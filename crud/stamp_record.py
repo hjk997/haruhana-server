@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from core.config import settings
+from schemas.stamp_record import StampRecordUpdate
 
 # MongoDB 연결 (환경에 맞게 수정)
 client = MongoClient(settings.MONGO_URL)
@@ -27,6 +28,20 @@ def delete_stamp_record(stamp_id: str):
     
     result = collection.delete_one(query)
     return result.deleted_count
+
+def update_stamp_record(stamp_id: str, update_data: StampRecordUpdate):
+    """조건에 맞는 문서 한 건 업데이트"""
+    result = collection.update_one(
+        {"stamp_id": stamp_id},
+        {"$set": {
+            "data.$[elem].memo": update_data.memo,
+            "data.$[elem].is_complete": update_data.is_complete,
+            "data.$[elem].complete_dt": update_data.complete_dt
+        }},
+        array_filters=[{"elem.step": update_data.step}]
+    )
+    
+    return result.modified_count
 
 def init_data(stamp_id : str, stamp_cnt: int):
     """초기 데이터 생성 함수"""

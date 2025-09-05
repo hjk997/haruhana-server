@@ -1,5 +1,5 @@
 import pytest
-from service.mongo import (
+from crud.stamp_record import (
     init_stamp_record, 
     find_stamp_record, 
     delete_stamp_record,

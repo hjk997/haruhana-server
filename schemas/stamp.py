@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import date
 from uuid import UUID
+from sqlalchemy import func
 
 class StampBase(BaseModel):
     class Config:
@@ -22,8 +23,10 @@ class StampPublic(StampBase):
     is_delete : bool 
     before_image_id : UUID | None = None
     after_image_id : UUID | None = None
+    before_image_url: str | None = None
+    after_image_url: str | None = None
     image_url: str | None = None
-    
+
 class StampCreate(StampBase):
     user_id : str | None = None
     stamp_nm : str 
@@ -40,6 +43,10 @@ class StampUpdate(StampBase):
     modify_dt : date 
   
 class StampProgressUpdate(StampBase):
+    def __init__(self, progress_cnt: int):
+        self.progress_cnt = progress_cnt
+        self.modify_dt = func.now()
+
     progress_cnt : int 
     modify_dt : date 
       

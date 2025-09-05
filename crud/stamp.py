@@ -1,9 +1,11 @@
+from uuid import UUID
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from models.stamp import Stamps
 from schemas.stamp import StampCreate, StampProgressUpdate, StampCompleteUpdate, StampUpdate, StampDelete
 from schemas.common import ResponseMessage
 from core.logger import logger 
+from sqlalchemy import func
 
 # -----------------------------
 # 스탬프 목록 조회
@@ -28,7 +30,7 @@ def create_stamp(stamp: StampCreate, db: Session):
     db.add(new_stamp)
     try:
         db.commit()
-        return ResponseMessage(code=200, message="stamp created successfully")
+        return ResponseMessage(code=200, message="stamp created successfully", id=str(new_stamp.stamp_id))
     except Exception as e:
         logger.error(f"Error creating stamp: {str(e)}")
         db.rollback()
@@ -39,7 +41,7 @@ def create_stamp(stamp: StampCreate, db: Session):
 # 스탬프 조회
 # -----------------------------
 def get_stamp(stamp_id: str, db: Session):
-    stamps = db.query(Stamps).filter(Stamps.stamp_id == stamp_id).first()
+    stamps = db.query(Stamps).filter(Stamps.stamp_id == UUID(stamp_id)).first()
     return stamps
 
 # -----------------------------
@@ -66,14 +68,13 @@ def update_stamp_metadata(stamp_id: str, updated_stamp: StampUpdate, db: Session
 # -----------------------------
 # 진행도 업데이트
 # -----------------------------
-def update_stamp_progress(stamp_id: str, updated_stamp: StampProgressUpdate, db: Session):
+def update_stamp_progress(stamp_id: str, progress_cnt: int, db: Session):
     stamp = db.query(Stamps).filter(Stamps.stamp_id == stamp_id).first()
     if not stamp_id:
         raise HTTPException(status_code=404, detail="User not found")
-    
-    # dict() → model_dump(exclude_unset=True)로 변경
-    for key, value in updated_stamp.model_dump(exclude_unset=True).items():
-        setattr(stamp, key, value)
+
+    setattr(stamp, 'progress_cnt', progress_cnt)
+    setattr(stamp, 'modify_dt', func.now())
 
     try:
         db.commit()
@@ -82,20 +83,18 @@ def update_stamp_progress(stamp_id: str, updated_stamp: StampProgressUpdate, db:
         logger.error(f"Error updating stamp: {str(e)}")
         db.rollback()
         return ResponseMessage(code=500, message=f"Error: {str(e)}")
-    #db.refresh(user)
     
 # -----------------------------
 # 완료 여부 업데이트
 # -----------------------------
-def update_stamp_complete(stamp_id: str, updated_stamp: StampCompleteUpdate, db: Session):
+def update_stamp_complete(stamp_id: str, db: Session):
     stamp = db.query(Stamps).filter(Stamps.stamp_id == stamp_id).first()
     if not stamp_id:
         raise HTTPException(status_code=404, detail="User not found")
     
-    # dict() → model_dump(exclude_unset=True)로 변경
-    for key, value in updated_stamp.model_dump(exclude_unset=True).items():
-        setattr(stamp, key, value)
-
+    setattr(stamp, 'is_complete', True)
+    setattr(stamp, 'modify_dt', func.now())
+    setattr(stamp, 'complete_dt', func.now())
     try:
         db.commit()
         return ResponseMessage(code=200, message="Stamp updated successfully")
@@ -103,20 +102,19 @@ def update_stamp_complete(stamp_id: str, updated_stamp: StampCompleteUpdate, db:
         logger.error(f"Error updating stamp: {str(e)}")
         db.rollback()
         return ResponseMessage(code=500, message=f"Error: {str(e)}")
-    #db.refresh(user)
     
 
 # -----------------------------
 # 삭제
 # -----------------------------
-def delete_stamp(stamp_id: str, deleted_stamp: StampDelete, db: Session):
+def delete_stamp(stamp_id: str, db: Session):
     stamp = db.query(Stamps).filter(Stamps.stamp_id == stamp_id).first()
     if not stamp:
         raise HTTPException(status_code=404, detail="User not found")
     
-     # dict() → model_dump(exclude_unset=True)로 변경
-    for key, value in deleted_stamp.model_dump(exclude_unset=True).items():
-        setattr(stamp, key, value)
+    setattr(stamp, 'is_delete', True)
+    setattr(stamp, 'modify_dt', func.now())
+    setattr(stamp, 'delete_dt', func.now())
 
     try:
         db.commit()
@@ -125,5 +123,4 @@ def delete_stamp(stamp_id: str, deleted_stamp: StampDelete, db: Session):
         logger.error(f"Error updating stamp: {str(e)}")
         db.rollback()
         return ResponseMessage(code=500, message=f"Error: {str(e)}")
-    #db.refresh(user)
    

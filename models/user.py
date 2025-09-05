@@ -11,6 +11,6 @@ class Users(Base):
     user_nm = Column(String(30), nullable=False)                  # VARCHAR(30)
     user_email = Column(String(50), nullable=False)               # VARCHAR(50)
     user_pw = Column(String(60), nullable=False)                  # VARCHAR(50)
-    create_dt = Column(Date, nullable=True, server_default=func.now())                       # DATE
+    create_dt = Column(Date, nullable=True, server_default=func.current_timestamp())                       # DATE
     delete_dt = Column(Date, nullable=True)                       # DATE, NULL 허용
     is_delete = Column(Boolean, nullable=False, default=False)     # BOOLEAN
