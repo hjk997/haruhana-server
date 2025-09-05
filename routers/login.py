@@ -46,8 +46,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 # 세션 갱신
 # -----------------------------
 @login_router.post("/refresh")
-def refresh_token(data: str = Form(...)):
-    refresh_token = data.refresh_token
+def refresh_token(refresh_token: str = Form(...)):
     try:
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("user_id")
