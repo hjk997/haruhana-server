@@ -21,10 +21,10 @@ stamp_router = APIRouter(
 # 스탬프 목록 조회(추후 필요시 페이징 처리 추가)
 # -----------------------------
 @stamp_router.get("/list", response_model=List[StampPublic])
-def get_stamp_list_route(request: Request, db: Session = Depends(get_db)):
+def get_stamp_list_route(request: Request, is_complete: str, db: Session = Depends(get_db)):
     user = request.state.user
-    stamps = get_stamp_list(user["user_id"], db=db)
-    
+    stamps = get_stamp_list(user["user_id"], (is_complete == "Y" if True else False), db=db)
+
     for stamp in stamps:
         image_key = get_stamp_image_name_by_id(stamp.after_image_id, db=db)
         response = download_file(image_key)
