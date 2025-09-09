@@ -7,9 +7,8 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"  # DEBUG, INFO, WARNING, ERROR
     LOG_FILE: str = "app.log"
     MONGO_URL: str
-    MINIO_ENDPOINT: str
-    MINIO_ACCESS_KEY: str
-    MINIO_SECRET_KEY: str
+    AWS_ACCESS_KEY: str
+    AWS_SECRET_KEY: str
     BUCKET_NAME: str
 
     class Config:
