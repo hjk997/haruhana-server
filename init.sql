@@ -7,8 +7,8 @@ CREATE TABLE users (
     user_email VARCHAR(50) NOT NULL,
     create_dt DATE default current_timestamp,
     delete_dt DATE,
-    isDelete BOOLEAN DEFAULT FALSE,
-    CONSTRAINT uq_user_id UNIQUE (user_id)     -- user_id는 고유값 보장
+    is_delete BOOLEAN DEFAULT FALSE,
+    CONSTRAINT uq_user_id UNIQUE (user_id) ,    -- user_id는 고유값 보장
     CONSTRAINT uq_user_email UNIQUE (user_email)     -- user_email은 고유값 보장
 );
 
@@ -92,7 +92,7 @@ CREATE TABLE stamp_images (
 
 COMMENT ON TABLE stamp_images IS '스탬프 이미지 테이블';
 COMMENT ON COLUMN stamp_images.image_key IS 'PK, 자동 증가';
-COMMENT ON COLUMN stamp_images.image_url IS '이미지 URL(S3 또는 MinIO 경로)';
+COMMENT ON COLUMN stamp_images.image_key IS '이미지 URL(S3 또는 MinIO 경로)';
 COMMENT ON COLUMN stamp_images.is_public IS '공개 여부 플래그';
 COMMENT ON COLUMN stamp_images.user_id IS 'FK, users.user_id: 유저 전용일 시 사용';
 COMMENT ON COLUMN stamp_images.create_dt IS '업로드 일자';
@@ -107,3 +107,31 @@ ALTER TABLE stamps ADD CONSTRAINT fk_before_image FOREIGN KEY (before_image_id) 
 ALTER TABLE stamps ADD CONSTRAINT fk_after_image FOREIGN KEY (after_image_id) REFERENCES stamp_images(image_id);
 
 ALTER TABLE stamp_images ADD CONSTRAINT uq_image_key UNIQUE (image_key);  -- image_key는 고유값 보장
+
+/**
+*   2025.09.08 친구 테이블 추가 
+*
+*/
+CREATE TABLE friends (
+    friend_id UUID PRIMARY KEY,
+    user_id VARCHAR(30) NOT NULL,
+    friend_user_id VARCHAR(30) NOT NULL,
+    friend_status VARCHAR(10) DEFAULT 'PENDING', -- PENDING, ACCEPTED, REJECTED
+    create_dt DATE default current_timestamp,
+    delete_dt DATE,
+    is_delete BOOLEAN DEFAULT FALSE,
+    CONSTRAINT fk_friend_user FOREIGN KEY (user_id) REFERENCES "users"(user_id),
+    CONSTRAINT fk_friend_friend_user FOREIGN KEY (friend_user_id) REFERENCES "users"(user_id)
+);
+COMMENT ON TABLE friends IS '친구 관계 테이블';
+COMMENT ON COLUMN friends.friend_id IS 'PK, 자동 증가';
+COMMENT ON COLUMN friends.user_id IS 'FK, users.user_id: 친구 요청을 보낸 사용자';
+COMMENT ON COLUMN friends.friend_user_id IS 'FK, users.user_id: 친구 요청을 받은 사용자';
+COMMENT ON COLUMN friends.friend_status IS '친구 상태 (PENDING, ACCEPTED, REJECTED)';
+COMMENT ON COLUMN friends.create_dt IS '생성일';
+COMMENT ON COLUMN friends.delete_dt IS '삭제일';
+COMMENT ON COLUMN friends.is_delete IS '삭제 여부 플래그';
+ALTER TABLE friends ADD CONSTRAINT uq_friend UNIQUE (user_id, friend_user_id);  -- user_id와 friend_user_id 조합은 고유값 보장
+-- 친구 요청 인덱스
+CREATE INDEX idx_friend_user_id ON friends(user_id);
+CREATE INDEX idx_friend_friend_user_id ON friends(friend_user_id);
