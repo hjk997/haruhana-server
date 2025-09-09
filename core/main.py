@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Depends
 from fastapi.responses import JSONResponse
 from jose import jwt, JWTError
 from core.logger import logger 
-from routers import login, signup, stamp, stamp_image
+from routers import login, signup, stamp, stamp_image, friend, user
 from fastapi.middleware.cors import CORSMiddleware
 from schemas.common import ResponseMessage
 ctx = ''
@@ -16,6 +16,8 @@ app.include_router(login.login_router)
 app.include_router(signup.signup_router)
 app.include_router(stamp.stamp_router)
 app.include_router(stamp_image.stamp_image_router)
+app.include_router(friend.friend_router)
+app.include_router(user.user_router)
 
 # CORS 에러 처리 : 로컬에서만 허용 
 origins = [

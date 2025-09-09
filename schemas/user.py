@@ -6,7 +6,7 @@ class UserBase(BaseModel):
     user_email : str 
     
 class UserPublic(UserBase):
-    pass 
+    user_id : str 
     
 class UserCreate(UserBase):
     user_id : str

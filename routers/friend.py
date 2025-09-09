@@ -16,7 +16,7 @@ friend_router = APIRouter(
 # 친구 목록 조회(추후 필요시 페이징 처리 추가)
 # -----------------------------
 @friend_router.get("/list", response_model=List[FriendPublic])
-def get_friend_list_route(request: Request, is_complete: str, db: Session = Depends(get_db)):
+def get_friend_list_route(request: Request, db: Session = Depends(get_db)):
     user = request.state.user
     friends = get_friend_list(user["user_id"], db=db)
 

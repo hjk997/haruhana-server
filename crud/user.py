@@ -9,6 +9,18 @@ from core.logger import logger
 pwcrypt_context = CryptContext(schemes=['bcrypt'], deprecated="auto")
 
 # -----------------------------
+# 유저 목록 조회
+# -----------------------------
+def get_user_list(query: str, db: Session):
+    users = db.query(Users).filter(
+        (
+            (Users.user_id.contains(query)) | 
+            (Users.user_nm.contains(query)) 
+        ) & (Users.is_delete == False)
+    ).all()
+    return users
+
+# -----------------------------
 # 조회
 # -----------------------------
 def get_user(user_id: str, db: Session):
