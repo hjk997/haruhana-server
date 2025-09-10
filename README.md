@@ -2,8 +2,6 @@
 
 이 프로젝트는 **습관 달성표(스탬프)** 를 기록하고 관리하는 웹 애플리케이션입니다.  
 
-백엔드: FastAPI + PostgreSQL + MongoDB 
-
 향후 PWA로 배포하여 AWS 상에서 서비스할 계획입니다.
 
 ---
@@ -13,7 +11,7 @@
 - 스탬프 목록은 **스탬프 뷰** 와 **리스트 뷰** 두 가지 형태로 제공합니다.
 - 로그인/회원가입 및 인증은 **JWT 기반**으로 처리합니다.
 - 사용자는 목표 달성을 위한 스탬프를 만들 수 있습니다. 스탬프 이미지는 직접 등록할 수도 있습니다.
-- 이미지 업로드는 **S3 연동**을 목표로 합니다.
+- 스탬프 이미지는 **S3를 연동**하여, 사용자가 자유롭게 업로드할 수 있습니다. 
 - 매일 목표를 달성하고 스탬프를 채웁니다. 일별로 간단한 메모도 추가할 수 있습니다. 
 - 초기 배포는 **AWS (EC2, RDS, S3, Route53 등)** 을 활용할 예정입니다.
 
@@ -28,11 +26,9 @@
 ### Backend
 - FastAPI (Python)
 - SQLAlchemy / SQLModel (ORM)
-- PostgreSQL (RDB)  
-  - 개발 환경: Docker + PostgreSQL
-  - 운영 환경: AWS RDS (Aurora Serverless v2 고려)
+- PostgreSQL (AWS RDS)
 - JWT 인증 (OAuth2PasswordBearer 기반)
-- (Optional) MongoDB for flexible memo storage
+- MongoDB Atlas
 
 ### DevOps & Infra
 - Docker / Docker Compose
