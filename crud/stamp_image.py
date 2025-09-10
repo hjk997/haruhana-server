@@ -16,14 +16,18 @@ def get_stamp_image_list(user_id: str, image_type: str, db: Session):
             StampImages.image_type == image_type,
             StampImages.is_delete == False
         )
-        ).all()
+    ).order_by(
+        StampImages.create_dt.desc()
+    ).all()
     stamps_user = db.query(StampImages).filter(
         and_(
             StampImages.user_id == user_id, 
             StampImages.image_type == image_type,
             StampImages.is_delete == False
         )
-        ).all()
+    ).order_by(
+        StampImages.create_dt.desc()
+    ).all()
     stamp_images = stamps_user + stamps_public
     
     return stamp_images

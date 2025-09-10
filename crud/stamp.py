@@ -11,7 +11,11 @@ from sqlalchemy import func
 # 스탬프 목록 조회
 # -----------------------------
 def get_stamp_list(user_id: str, is_complete: bool, db: Session):
-    stamps = db.query(Stamps).filter(Stamps.user_id == user_id, Stamps.is_complete == is_complete).all()
+    stamps = db.query(Stamps).filter(
+        Stamps.user_id == user_id, Stamps.is_complete == is_complete
+    ).order_by(
+        Stamps.create_dt.desc()
+    ).all()
     return stamps
 
 # -----------------------------

@@ -10,7 +10,7 @@ from sqlalchemy import func
 # -----------------------------
 # 친구 목록 조회
 # -----------------------------
-def get_friend_list(user_id: str, db: Session):
+def get_friend_list(user_id: str, status: str, db: Session):
     # Friends 테이블을 self join하여 친구의 user 정보까지 가져오기
     FriendAlias = aliased(Friends)  # 별칭 생성
     friends = (
@@ -20,9 +20,16 @@ def get_friend_list(user_id: str, db: Session):
         # Friends → Friend (셀프조인: 내가 추가한 친구 관계)
         .join(FriendAlias, Friends.user_id == FriendAlias.user_id)
         .filter(Friends.user_id == user_id and Friends.is_delete == False)
-        .all()
     )
     
+    if status == "ALL":
+        friends = friends.filter(Friends.friend_status != 'REJECTED')
+    elif status == "PENDING":
+        friends = friends.filter(Friends.friend_status == 'PENDING')
+    # 필요하다면 ACCEPTED 등 다른 조건도 추가 가능
+
+    friends = friends.order_by(Friends.create_dt.desc()).all()
+
     friend_list = []
     for ele in friends:
         friend_info = FriendPublic(

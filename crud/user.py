@@ -11,13 +11,16 @@ pwcrypt_context = CryptContext(schemes=['bcrypt'], deprecated="auto")
 # -----------------------------
 # 유저 목록 조회
 # -----------------------------
-def get_user_list(query: str, db: Session):
+def get_user_list(query: str, user_id: str, db: Session):
     users = db.query(Users).filter(
         (
             (Users.user_id.contains(query)) | 
             (Users.user_nm.contains(query)) 
         ) & (Users.is_delete == False)
-    ).all()
+    ).order_by(Users.user_nm.asc()).all()
+
+    # 자기 자신은 목록에서 제외
+    users = [user for user in users if user.user_id != user_id]
     return users
 
 # -----------------------------
