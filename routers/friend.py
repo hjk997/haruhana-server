@@ -27,6 +27,7 @@ def get_friend_list_route(request: Request, status: str, db: Session = Depends(g
 @friend_router.post("", response_model=ResponseMessage)
 def create_friend_route(request: Request, friend: FriendCreate, db: Session = Depends(get_db)):
     # db에 친구 생성
+    friend.user_id = request.state.user["user_id"]
     msg = create_friend(friend, db=db)
     
     return msg
@@ -35,7 +36,8 @@ def create_friend_route(request: Request, friend: FriendCreate, db: Session = De
 # 친구 삭제
 # -----------------------------
 @friend_router.delete("", response_model=ResponseMessage)
-def delete_friend_route(friend: FriendDelete, db: Session = Depends(get_db)):
+def delete_friend_route(request: Request, friend: FriendDelete, db: Session = Depends(get_db)):
+    friend.user_id = request.state.user["user_id"]
     msg = delete_friend(friend, db=db)
     return msg
 
@@ -43,6 +45,7 @@ def delete_friend_route(friend: FriendDelete, db: Session = Depends(get_db)):
 # 친구 상태 업데이트
 # -----------------------------
 @friend_router.put("/status", response_model=ResponseMessage)
-def update_friend_status_route(friend: FriendUpdateStatus, db: Session = Depends(get_db)):
+def update_friend_status_route(request: Request, friend: FriendUpdateStatus, db: Session = Depends(get_db)):
+    friend.user_id = request.state.user["user_id"]
     msg = update_friend_status(friend, db=db)
     return msg
