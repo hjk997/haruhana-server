@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     AWS_ACCESS_KEY: str
     AWS_SECRET_KEY: str
     BUCKET_NAME: str
+    FRONT_URL: str
 
     class Config:
         env_file = ".env"   # .env에서 읽기

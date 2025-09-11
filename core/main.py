@@ -5,6 +5,7 @@ from core.logger import logger
 from routers import login, signup, stamp, stamp_image, friend, user
 from fastapi.middleware.cors import CORSMiddleware
 from schemas.common import ResponseMessage
+from core.config import settings
 ctx = ''
 
 SECRET_KEY = "supersecret"
@@ -22,7 +23,8 @@ app.include_router(user.user_router)
 # CORS 에러 처리 : 로컬에서만 허용 
 origins = [
     "http://localhost:5500",  # 예시: VSCode Live Server
-    "http://127.0.0.1:5500"
+    "http://127.0.0.1:5500",
+    settings.FRONT_URL
 ]
 
 app.add_middleware(

@@ -9,3 +9,4 @@ pydantic-settings
 boto3
 python-multipart
 pymongo
+psycopg2-binary
