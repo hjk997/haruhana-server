@@ -135,3 +135,33 @@ ALTER TABLE friends ADD CONSTRAINT uq_friend UNIQUE (user_id, friend_user_id);  
 -- 친구 요청 인덱스
 CREATE INDEX idx_friend_user_id ON friends(user_id);
 CREATE INDEX idx_friend_friend_user_id ON friends(friend_user_id);
+
+create table notices (
+    notice_id UUID PRIMARY KEY,
+    user_id VARCHAR(30) NOT NULL,
+    notice_type VARCHAR(20) NOT NULL,
+    notice_message TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    is_send BOOLEAN DEFAULT FALSE,
+    is_delete BOOLEAN DEFAULT FALSE,
+    create_dt DATE default current_timestamp,
+    read_dt DATE,
+    delete_dt DATE,
+    CONSTRAINT fk_notice_user FOREIGN KEY (user_id) REFERENCES "users"(user_id)
+);
+COMMENT ON TABLE notices IS '알림 테이블';
+COMMENT ON COLUMN notices.notice_id IS 'PK, 자동 증가';
+COMMENT ON COLUMN notices.user_id IS 'FK, users.user_id: 알림 대상 유저';
+COMMENT ON COLUMN notices.notice_type IS '알림 타입';
+COMMENT ON COLUMN notices.notice_message IS '알림 메시지';
+COMMENT ON COLUMN notices.is_read IS '읽음 여부';
+COMMENT ON COLUMN notices.is_send IS '발송 여부';
+COMMENT ON COLUMN notices.is_delete IS '삭제 여부';
+COMMENT ON COLUMN notices.create_dt IS '생성일';
+COMMENT ON COLUMN notices.read_dt IS '읽은 일자';
+COMMENT ON COLUMN notices.delete_dt IS '삭제 일자';
+
+CREATE INDEX idx_notice_user_id ON notices(user_id);
+
+ALTER TABLE notices ADD COLUMN notice_target VARCHAR(30);
+COMMENT ON COLUMN notices.notice_target IS '알림 대상 (예: 친구 요청을 보낸 사용자 ID)';
