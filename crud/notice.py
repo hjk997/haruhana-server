@@ -19,8 +19,19 @@ def get_notice_list(notice_list_param: NoticeList, db: Session):
         .limit(notice_list_param.limit)
         .all()
     )
-    
+
+    for notice in notices:
+        notice.notice_id = str(notice.notice_id)
+        
     return notices
+
+def get_unread_notice_count(user_id: str, db: Session):
+    count = (
+        db.query(func.count(Notices.notice_id))
+        .filter(Notices.user_id == user_id, Notices.is_read == False, Notices.is_delete == False)
+        .scalar()
+    )
+    return count
 
 # -----------------------------
 # 알림 추가
@@ -30,7 +41,8 @@ def create_notice(notice: NoticeCreate, db: Session):
         user_id=notice.user_id,
         notice_type=notice.notice_type,
         notice_message=notice.notice_message,
-        notice_target=notice.notice_target
+        notice_target=notice.notice_target,
+        is_send=True # 추후에 알림 서비스 연동하게되면 사용하고 지금은 일단 발송상태로 저장
     )
         
     db.add(new_notice)

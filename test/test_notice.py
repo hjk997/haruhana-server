@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from crud.user import create_user
 from models.notice import Notices
 from schemas.notice import NoticeCreate, NoticeDelete, NoticeList, NoticeUpdateRead, NoticeUpdateSend
-from crud.notice import create_notice, get_notice_list,  delete_notice, read_notice, send_notice
+from crud.notice import create_notice, get_notice_list,  delete_notice, get_unread_notice_count, read_notice, send_notice
 from schemas.common import ResponseMessage
 from datetime import date
 from sqlalchemy import create_engine
@@ -68,6 +68,11 @@ def create_notice_fixture(db: Session, test_notice_data):
     response = create_notice(test_notice_data, db)
     yield response
 
+def test_unread_notice_count_is_not_zero(db: Session, test_notice_data):
+    response = get_unread_notice_count(test_notice_data.user_id, db)
+    assert isinstance(response, int)
+    assert response == 1
+    
 def test_send_notice(db: Session, test_notice_data, create_notice_fixture):
     # given
     notice_update = NoticeUpdateSend(
@@ -103,6 +108,11 @@ def test_read_notice(db: Session, create_notice_fixture):
     assert isinstance(response, ResponseMessage)
     assert response.code == 200
 
+def test_unread_notice_count_is_zero(db: Session, test_notice_data):
+    response = get_unread_notice_count(test_notice_data.user_id, db)
+    assert isinstance(response, int)
+    assert response == 0
+    
 def test_delete_notice(db: Session, create_notice_fixture):
     # given
     notice_delete = NoticeDelete(

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from schemas.common import ResponseMessage
 from db.database import get_db
 from schemas.notice import NoticePublic, NoticeList, NoticeUpdateRead, NoticeUpdateSend, NoticeDelete
-from crud.notice import get_notice_list, create_notice, delete_notice, read_notice, send_notice
+from crud.notice import get_notice_list, create_notice, delete_notice, get_unread_notice_count, read_notice, send_notice
 
 notice_router = APIRouter(
     prefix="/notice",
@@ -16,11 +16,24 @@ notice_router = APIRouter(
 # 알림 목록 조회
 # -----------------------------
 @notice_router.get("/list", response_model=List[NoticePublic])
-def get_notice_list_route(request: Request, param: NoticeList, db: Session = Depends(get_db)):
+def get_notice_list_route(request: Request, skip: int, limit: int, db: Session = Depends(get_db)):
     user = request.state.user
-    param.user_id = user["user_id"]
+    param = NoticeList(
+        user_id=user["user_id"],
+        skip=skip,
+        limit=limit
+    )
     notices = get_notice_list(param, db=db)
     return notices
+
+# -----------------------------
+# 읽지 않은 알림 개수 조회
+# -----------------------------
+@notice_router.get("/unread_count")
+def get_unread_notice_count_route(request: Request, db: Session = Depends(get_db)):
+    user = request.state.user
+    count = get_unread_notice_count(user["user_id"], db=db)
+    return {"count": count}
 
 # -----------------------------
 # 알림 전송: userId를 받아서 is_send가 False인 알림들을 True로 변경
