@@ -3,9 +3,51 @@ from sqlalchemy.orm import Session, aliased
 from schemas.common import ResponseMessage
 from models.friend import Friends
 from models.user import Users
-from schemas.friend import FriendCreate, FriendUpdateStatus, FriendPublic, FriendDelete
+from schemas.friend import FriendCreate, FriendUpdateStatus, FriendPublic, FriendDelete, UserSearch
 from core.logger import logger 
-from sqlalchemy import func
+from sqlalchemy import func, select
+from schemas.user import UserPublic
+
+# -----------------------------
+# 유저 목록 조회(친구 조회되었을 경우 친구 상태 포함)
+# -----------------------------
+def get_user_with_friend_info_list(query: str, user_id: str, db: Session):    
+    friend_list_table = (
+        select(Friends)
+        .where(Friends.user_id == user_id)
+        .subquery()
+    )
+    
+    users = (
+        select(Users, friend_list_table.c.friend_status)
+        .outerjoin(
+            friend_list_table,
+            (friend_list_table.c.friend_user_id == Users.user_id)
+        )
+        .where(
+            ((Users.user_id.contains(query)) | (Users.user_nm.contains(query))) &
+            (Users.is_delete == False) &
+            (Users.user_id != user_id) 
+        )
+        .order_by(Users.user_nm.asc())
+    )
+    
+    result = db.execute(users).all()
+
+    user_list = []
+    for ele in result:
+        user = ele.Users
+        friend_status = ele.friend_status
+        
+        user_info = UserSearch(
+            user_id=user.user_id,
+            user_nm=user.user_nm,
+            user_email=user.user_email,
+            friend_status=friend_status 
+        )
+        user_list.append(user_info)
+        
+    return user_list
 
 # -----------------------------
 # 친구 목록 조회
@@ -22,10 +64,14 @@ def get_friend_list(user_id: str, status: str, db: Session):
         .filter(Friends.user_id == user_id and Friends.is_delete == False)
     )
     
-    if status == "ALL":
-        friends = friends.filter(Friends.friend_status != 'REJECTED')
+    if status == "ACCEPTED":
+        friends = friends.filter(Friends.friend_status == 'ACCEPTED')
     elif status == "PENDING":
         friends = friends.filter(Friends.friend_status == 'PENDING')
+    elif status == "RECEIVED":
+        friends = friends.filter(Friends.friend_status == 'RECEIVED')
+    else:
+        return []
     # 필요하다면 ACCEPTED 등 다른 조건도 추가 가능
 
     friends = friends.order_by(Friends.create_dt.desc()).all()
@@ -43,7 +89,6 @@ def get_friend_list(user_id: str, status: str, db: Session):
             friend_user_nm=ele.Users.user_nm,
             friend_user_email=ele.Users.user_email
         )
-        print(friend_info)
         friend_list.append(friend_info)
     return friend_list
 
@@ -59,7 +104,7 @@ def create_friend(friend: FriendCreate, db: Session):
     new_friend2 = Friends(
         user_id=friend.friend_user_id,
         friend_user_id=friend.user_id,
-        friend_status="PENDING"
+        friend_status="RECEIVED"
     )
     db.add_all([new_friend1, new_friend2])
     try:
@@ -106,6 +151,7 @@ def delete_friend(deleted_friend: FriendDelete, db: Session):
         raise HTTPException(status_code=404, detail="Friend relationship not found")
 
     for friend in friends:
+        friend.friend_status = "DELETED"
         friend.is_delete = True
         friend.delete_dt = func.now()
         

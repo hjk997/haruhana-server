@@ -1,12 +1,17 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
 
+from schemas.user import UserPublic
+
 class FriendBase(BaseModel):
     user_id: str | None = None
     friend_user_id: str
     
     class Config:
         from_attributes = True
+    
+class UserSearch(UserPublic):
+    friend_status: str | None = None
     
 class FriendPublic(FriendBase):
     friend_user_nm: str | None = None

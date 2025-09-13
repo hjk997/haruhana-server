@@ -1,8 +1,8 @@
 import pytest
 from sqlalchemy.orm import Session
 from models.friend import Friends
-from schemas.friend import FriendCreate, FriendDelete, FriendUpdateStatus
-from crud.friend import create_friend, get_friend_list, update_friend_status, delete_friend
+from schemas.friend import FriendCreate, FriendDelete, FriendUpdateStatus, UserSearch
+from crud.friend import create_friend, get_friend_list, get_user_with_friend_info_list, update_friend_status, delete_friend
 from crud.user import create_user
 from schemas.user import UserCreate
 from schemas.common import ResponseMessage
@@ -65,7 +65,7 @@ def test_create_friend(db: Session, friend_data):
 
 def test_get_friend_list(db: Session, friend_data):
     # 친구 목록 조회
-    friends = get_friend_list(friend_data.user_id, db)
+    friends = get_friend_list(friend_data.user_id, 'PENDING', db)
     assert isinstance(friends, list)
     assert any(f.user_id == friend_data.user_id for f in friends)
 
@@ -89,3 +89,10 @@ def test_delete_friend(db: Session, friend_data):
     response = delete_friend(delete_data, db)
     assert isinstance(response, ResponseMessage)
     assert response.code == 200
+
+def test_get_user_with_friend_info_list(db: Session, friend_data):
+    query = "테스트"
+    user_id = friend_data.user_id
+    users = get_user_with_friend_info_list(query, user_id, db)
+    assert isinstance(users, list)
+    assert all(isinstance(user, UserSearch) for user in users)
