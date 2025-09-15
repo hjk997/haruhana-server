@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session, aliased
 from schemas.common import ResponseMessage
 from models.notice import Notices
-from schemas.notice import NoticeCreate, NoticeList, NoticeUpdateRead, NoticeUpdateSend, NoticeDelete
+from schemas.notice import NoticeCreate, NoticeList, NoticeUpdateAllRead, NoticeUpdateRead, NoticeUpdateSend, NoticeDelete
 from core.logger import logger 
 from sqlalchemy import func
 from uuid import UUID
@@ -96,6 +96,30 @@ def read_notice(updated_notice: NoticeUpdateRead, db: Session):
         return ResponseMessage(code=200, message="Notice updated successfully")
     except Exception as e:
         logger.error(f"Error updating notice: {str(e)}")
+        db.rollback()
+        return ResponseMessage(code=500, message=f"Error: {str(e)}")
+
+# -----------------------------
+# 모든 미독 알림 읽기
+# -----------------------------
+def read_all_notices(updated_notice: NoticeUpdateAllRead, db: Session):
+    notices = (
+        db.query(Notices)
+        .filter(Notices.user_id == updated_notice.user_id, Notices.is_read == False)
+        .all()
+    )
+    if not notices:
+        return ResponseMessage(code=200, message="No unread notices found", cnt=0)
+
+    for n in notices:
+        n.is_read = True
+        n.read_dt = func.now()
+
+    try:
+        db.commit()
+        return ResponseMessage(code=200, message="All notices updated successfully", cnt=len(notices))
+    except Exception as e:
+        logger.error(f"Error updating notices: {str(e)}")
         db.rollback()
         return ResponseMessage(code=500, message=f"Error: {str(e)}")
 

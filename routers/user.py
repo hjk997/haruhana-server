@@ -1,6 +1,7 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
+from urllib3 import request
 from schemas.user import UserCreate, UserUpdate, UserPublic
 from schemas.common import ResponseMessage
 from db.database import get_db
@@ -15,9 +16,10 @@ user_router = APIRouter(
 # 사용자 조회 
 # -----------------------------
 @user_router.get("/list", response_model=List[UserPublic])
-def get_user_list_route(query: str, db: Session = Depends(get_db)):
-   users = get_user_list(query, db=db)
-   return users
+def get_user_list_route(request: Request, query: str, db: Session = Depends(get_db)):
+    user = request.state.user
+    users = get_user_list(query, user["user_id"], db=db)
+    return users
 
 # -----------------------------
 # 단일 사용자 조회

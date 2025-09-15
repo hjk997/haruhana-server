@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, Request, File, Form, Uplo
 from sqlalchemy.orm import Session
 from schemas.common import ResponseMessage
 from db.database import get_db
-from schemas.notice import NoticePublic, NoticeList, NoticeUpdateRead, NoticeUpdateSend, NoticeDelete
-from crud.notice import get_notice_list, create_notice, delete_notice, get_unread_notice_count, read_notice, send_notice
+from schemas.notice import NoticePublic, NoticeList, NoticeUpdateAllRead, NoticeUpdateRead, NoticeUpdateSend, NoticeDelete
+from crud.notice import get_notice_list, create_notice, delete_notice, get_unread_notice_count, read_all_notices, read_notice, send_notice
 
 notice_router = APIRouter(
     prefix="/notice",
@@ -54,10 +54,21 @@ def read_notice_route(request: Request, param: NoticeUpdateRead, db: Session = D
     return msg
 
 # -----------------------------
+# 전체 알림 읽기
+# -----------------------------
+@notice_router.post("/read-all", response_model=ResponseMessage)
+def read_all_notices_route(request: Request, db: Session = Depends(get_db)):
+    user_id = request.state.user["user_id"]
+    param = NoticeUpdateAllRead(
+        user_id=user_id
+    )
+    msg = read_all_notices(param, db=db)
+    return msg
+
+# -----------------------------
 # 알림 삭제
 # -----------------------------
 @notice_router.delete("/", response_model=ResponseMessage)
-def delete_notice_route(request: Request, param: NoticeDelete, db: Session = Depends(get_db)):
-    param.user_id = request.state.user["user_id"]
+def delete_notice_route(param: NoticeDelete, db: Session = Depends(get_db)):
     msg = delete_notice(param, db=db)
     return msg

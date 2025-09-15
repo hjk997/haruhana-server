@@ -33,7 +33,10 @@ class NoticeCreate(NoticeBase):
 
 class NoticeUpdateRead(NoticeBase):
     pass
-    
+
+class NoticeUpdateAllRead(NoticeBase):
+    user_id: str | None = None
+
 class NoticeUpdateSend(NoticeBase):
     user_id: str | None = None
 
