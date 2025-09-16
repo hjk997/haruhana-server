@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
+from sqlmodel import func
 from models.stamp_image import StampImages
 from schemas.stamp_image import StampImagePublic, StampImageCreate, StampImageDelete
 from schemas.common import ResponseMessage
@@ -64,11 +65,15 @@ def create_stamp_image(stamp_image: StampImageCreate, db: Session):
 # -----------------------------
 # 삭제
 # -----------------------------
-def delete_stamp_image(image_id: str, db: Session):
-    stamp_image = db.query(StampImages).filter(StampImages.image_id == image_id).first()
+def delete_stamp_image(param: StampImageDelete, db: Session):
+    stamp_image = db.query(StampImages).filter(StampImages.image_id == param.image_id).first()
     if not stamp_image:
         raise HTTPException(status_code=404, detail="User not found")
-    db.delete(stamp_image)
+    if stamp_image.is_public == True:
+        raise HTTPException(status_code=400, detail="Cannot delete a public image")
+    
+    stamp_image.is_delete = True
+    stamp_image.delete_dt = func.now()
     try:
         db.commit()
         return ResponseMessage(code=200, message="Stamp image deleted successfully")

@@ -56,3 +56,12 @@ def insert_stamp_image_route(request: Request, file: UploadFile, image_type: str
     result = create_stamp_image(stamp_param, db=db)
     return result
     
+
+# -----------------------------
+# 스탬프 이미지 삭제
+# -----------------------------
+@stamp_image_router.delete("/", response_model=ResponseMessage)
+def delete_stamp_image_route(param: StampImageDelete, db: Session = Depends(get_db)):
+    result = delete_stamp_image(param, db=db)
+    return result
+    

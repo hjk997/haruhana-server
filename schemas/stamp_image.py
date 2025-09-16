@@ -3,19 +3,20 @@ from datetime import date
 from uuid import UUID
 
 class StampImageBase(BaseModel):
-    image_key : str| None = None
-    is_public : bool 
-    image_type: str
-    
     class Config:
         from_attributes = True
     
 class StampImagePublic(StampImageBase):
     image_id : UUID 
+    image_key : str | None = None
+    is_public : bool 
+    image_type: str
     
 class StampImageCreate(StampImageBase):
     user_id : str | None = None
+    image_key : str | None = None
+    is_public : bool 
+    image_type: str
 
-class StampImageDelete(BaseModel):
-    is_delete: bool
-    delete_dt: date | None = None
+class StampImageDelete(StampImageBase):
+    image_id : str
