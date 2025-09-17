@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from core.config import settings
 from schemas.stamp_record import StampRecordUpdate
+from datetime import datetime, timedelta
 
 # MongoDB 연결 (환경에 맞게 수정)
 client = MongoClient(settings.MONGO_URL)
@@ -36,7 +37,8 @@ def update_stamp_record(stamp_id: str, update_data: StampRecordUpdate):
         {"$set": {
             "data.$[elem].memo": update_data.memo,
             "data.$[elem].is_complete": update_data.is_complete,
-            "data.$[elem].complete_dt": update_data.complete_dt
+            "data.$[elem].complete_dt": update_data.complete_dt,
+            "data.$[elem].is_over_check": update_data.is_over_check
         }},
         array_filters=[{"elem.step": update_data.step}]
     )
@@ -51,7 +53,9 @@ def init_data(stamp_id : str, stamp_cnt: int):
             "step": i,
             "memo": None,
             "is_complete": False,
-            "complete_dt": None
+            "complete_dt": None,
+            "require_dt": (datetime.now() + timedelta(days=(i - 1))).strftime("%Y-%m-%d"),
+            "is_over_check": False
         }
         step_datas.append(step_data)
     

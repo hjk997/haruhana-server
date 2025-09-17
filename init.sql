@@ -5,8 +5,8 @@ CREATE TABLE users (
     user_pw VARCHAR(60) NOT NULL,
     user_nm VARCHAR(30) NOT NULL,
     user_email VARCHAR(50) NOT NULL,
-    create_dt DATE default current_timestamp,
-    delete_dt DATE,
+    create_dt timestamp default current_timestamp,
+    delete_dt timestamp,
     is_delete BOOLEAN DEFAULT FALSE,
     CONSTRAINT uq_user_id UNIQUE (user_id) ,    -- user_id는 고유값 보장
     CONSTRAINT uq_user_email UNIQUE (user_email)     -- user_email은 고유값 보장
@@ -32,10 +32,10 @@ CREATE TABLE stamps (
     stamp_type VARCHAR(10),
     total_cnt INT NOT NULL,
     progress_cnt INT DEFAULT 0,
-    create_dt DATE default current_timestamp,
-    modify_dt DATE,
-    complete_dt DATE,
-    delete_dt DATE,
+    create_dt timestamp default current_timestamp,
+    modify_dt timestamp,
+    complete_dt timestamp,
+    delete_dt timestamp,
     is_complete BOOLEAN DEFAULT FALSE,
     is_delete BOOLEAN DEFAULT FALSE,
     CONSTRAINT fk_stamp_user FOREIGN KEY (user_id) REFERENCES "users"(user_id)
@@ -62,7 +62,7 @@ CREATE TABLE system_logs (
     user_id VARCHAR(30) NOT NULL,
     log_type VARCHAR(10) NOT NULL,
     log_desc text NOT NULL,
-    log_date DATE default current_timestamp,
+    log_date timestamp default current_timestamp,
     CONSTRAINT fk_log_user FOREIGN KEY (user_id) REFERENCES "users"(user_id)
 );
 
@@ -83,9 +83,9 @@ CREATE TABLE stamp_images (
     image_key TEXT NOT NULL,
     is_public BOOLEAN DEFAULT TRUE,
     user_id VARCHAR(30),
-    create_dt DATE default current_timestamp,
+    create_dt timestamp default current_timestamp,
     is_delete BOOLEAN DEFAULT FALSE,
-    delete_dt DATE,
+    delete_dt timestamp,
     image_type VARCHAR(10) NOT NULL,
     CONSTRAINT fk_image_user FOREIGN KEY (user_id) REFERENCES "users"(user_id)
 );
@@ -117,8 +117,8 @@ CREATE TABLE friends (
     user_id VARCHAR(30) NOT NULL,
     friend_user_id VARCHAR(30) NOT NULL,
     friend_status VARCHAR(10) DEFAULT 'PENDING', -- PENDING, ACCEPTED, REJECTED
-    create_dt DATE default current_timestamp,
-    delete_dt DATE,
+    create_dt timestamp default current_timestamp,
+    delete_dt timestamp,
     is_delete BOOLEAN DEFAULT FALSE,
     CONSTRAINT fk_friend_user FOREIGN KEY (user_id) REFERENCES "users"(user_id),
     CONSTRAINT fk_friend_friend_user FOREIGN KEY (friend_user_id) REFERENCES "users"(user_id)
@@ -144,9 +144,9 @@ create table notices (
     is_read BOOLEAN DEFAULT FALSE,
     is_send BOOLEAN DEFAULT FALSE,
     is_delete BOOLEAN DEFAULT FALSE,
-    create_dt DATE default current_timestamp,
-    read_dt DATE,
-    delete_dt DATE,
+    create_dt timestamp default current_timestamp,
+    read_dt timestamp,
+    delete_dt timestamp,
     CONSTRAINT fk_notice_user FOREIGN KEY (user_id) REFERENCES "users"(user_id)
 );
 COMMENT ON TABLE notices IS '알림 테이블';

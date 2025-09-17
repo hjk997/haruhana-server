@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
+from sqlalchemy import func
 
 from schemas.user import UserPublic
 
@@ -22,7 +23,7 @@ class FriendCreate(FriendBase):
     
 class FriendUpdateStatus(FriendBase):
     friend_status: str
-    modify_dt: str | None = Field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d"))
+    modify_dt: str | None = Field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     
 class FriendDelete(FriendBase):
     pass

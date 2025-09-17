@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import date
+from datetime import datetime
 
 class UserBase(BaseModel):
     user_nm : str 
@@ -16,7 +16,7 @@ class UserUpdate(UserBase):
     user_pw : str 
     
 class UserDelete(UserBase):
-    delete_dt : date 
+    delete_dt : datetime 
     is_delete : bool 
     
 class UserLogin():

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import date
+from datetime import datetime
 from uuid import UUID
 from sqlalchemy import func
 
@@ -15,10 +15,10 @@ class StampPublic(StampBase):
     stamp_type : str 
     total_cnt : int 
     progress_cnt : int 
-    create_dt : date | None = None
-    modify_dt : date | None = None
-    complete_dt : date | None = None
-    delete_dt : date | None = None
+    create_dt : datetime | None = None
+    modify_dt : datetime | None = None
+    complete_dt : datetime | None = None
+    delete_dt : datetime | None = None
     is_complete : bool 
     is_delete : bool 
     before_image_id : UUID | None = None
@@ -33,14 +33,14 @@ class StampCreate(StampBase):
     stamp_desc : str    
     stamp_type : str 
     total_cnt : int 
-    create_dt : date | None = None
+    create_dt : datetime | None = None
     before_image_id : str
     after_image_id : str 
 
 class StampUpdate(StampBase):
     stamp_nm : str 
     stamp_desc : str 
-    modify_dt : date 
+    modify_dt : datetime 
   
 class StampProgressUpdate(StampBase):
     def __init__(self, progress_cnt: int):
@@ -48,14 +48,12 @@ class StampProgressUpdate(StampBase):
         self.modify_dt = func.now()
 
     progress_cnt : int 
-    modify_dt : date 
+    modify_dt : datetime 
       
 class StampCompleteUpdate(StampBase):
     progress_cnt : int 
     is_complete : bool 
-    modify_dt : date 
+    modify_dt : datetime 
       
 class StampDelete(StampBase):
-    modify_dt : date 
-    delete_dt : date 
-    is_delete : bool 
+    stamp_id :str
