@@ -82,8 +82,8 @@ def get_stamp_record_route(stamp_id: str):
 # 스탬프 삭제
 # -----------------------------
 @stamp_router.delete("", response_model=ResponseMessage)
-def delete_stamp_route(stamp_id: str, db: Session = Depends(get_db)):
-    msg = delete_stamp(stamp_id, db=db)
+def delete_stamp_route(param: StampDelete, db: Session = Depends(get_db)):
+    msg = delete_stamp(param, db=db)
     return msg 
 
 # -----------------------------

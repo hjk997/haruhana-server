@@ -12,7 +12,9 @@ from sqlalchemy import func
 # -----------------------------
 def get_stamp_list(user_id: str, is_complete: bool, db: Session):
     stamps = db.query(Stamps).filter(
-        Stamps.user_id == user_id, Stamps.is_complete == is_complete
+        Stamps.user_id == user_id, 
+        Stamps.is_complete == is_complete,
+        Stamps.is_delete == False
     ).order_by(
         Stamps.create_dt.desc()
     ).all()
@@ -111,8 +113,8 @@ def update_stamp_complete(stamp_id: str, db: Session):
 # -----------------------------
 # 삭제
 # -----------------------------
-def delete_stamp(stamp_id: str, db: Session):
-    stamp = db.query(Stamps).filter(Stamps.stamp_id == stamp_id).first()
+def delete_stamp(param: StampDelete, db: Session):
+    stamp = db.query(Stamps).filter(Stamps.stamp_id == param.stamp_id).first()
     if not stamp:
         raise HTTPException(status_code=404, detail="User not found")
     
