@@ -14,3 +14,5 @@ class Users(Base):
     create_dt = Column(DateTime, nullable=True, server_default=func.current_timestamp())                       # DATE
     delete_dt = Column(DateTime, nullable=True)                       # DATE, NULL 허용
     is_delete = Column(Boolean, nullable=False, default=False)     # BOOLEAN
+    last_access_dt = Column(DateTime, nullable=True, server_default=func.current_timestamp())  # TIMESTAMP
+    last_stamp_check_dt = Column(DateTime, nullable=True)           # TIMESTAMP

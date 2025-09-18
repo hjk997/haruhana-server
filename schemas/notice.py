@@ -42,3 +42,15 @@ class NoticeUpdateSend(NoticeBase):
 
 class NoticeDelete(NoticeBase):
     pass
+
+# --- Pydantic model for incoming message data ---
+class SendNotificationRequest(BaseModel):    
+    token: str  # The FCM device token to send the message to
+    title: str
+    body: str
+    data: dict = {} # Optional custom data payload
+    
+class NoticeTokenCreate(BaseModel):
+    user_id: str | None = None
+    token: str
+    token_desc: str | None = None

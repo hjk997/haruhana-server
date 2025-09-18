@@ -165,3 +165,18 @@ CREATE INDEX idx_notice_user_id ON notices(user_id);
 
 ALTER TABLE notices ADD COLUMN notice_target VARCHAR(30);
 COMMENT ON COLUMN notices.notice_target IS '알림 대상 (예: 친구 요청을 보낸 사용자 ID)';
+
+ALTER TABLE users ADD COLUMN last_access_dt timestamp default current_timestamp;
+COMMENT ON COLUMN users.last_access_dt IS '사용자의 마지막 접속 일자';
+ALTER TABLE users ADD COLUMN last_stamp_check_dt timestamp;
+COMMENT ON COLUMN users.last_stamp_check_dt IS '사용자의 마지막 스탬프 확인 일자';
+alter table users drop column notification_token;
+
+CREATE TABLE notification_tokens (
+    token_id UUID PRIMARY KEY,
+    user_id VARCHAR(30) NOT NULL,
+    token TEXT NOT NULL,
+    token_desc TEXT,
+    create_dt timestamp default current_timestamp,
+    CONSTRAINT fk_token_user FOREIGN KEY (user_id) REFERENCES "users"(user_id)
+);

@@ -212,4 +212,5 @@ __marimo__/
 # vs code debug config
 launch.json
 
-init.txt
+# firebase admin sdk
+firebase-credential.json
