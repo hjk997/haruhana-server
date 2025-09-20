@@ -180,3 +180,6 @@ CREATE TABLE notification_tokens (
     create_dt timestamp default current_timestamp,
     CONSTRAINT fk_token_user FOREIGN KEY (user_id) REFERENCES "users"(user_id)
 );
+
+ALTER TABLE notification_tokens ADD COLUMN is_enabled BOOLEAN DEFAULT TRUE;
+COMMENT ON COLUMN notification_tokens.is_enabled IS '토큰 활성화 여부';
